@@ -1,0 +1,18 @@
+Source: src
+Section: python
+Priority: optional
+Maintainer: Ralf Schmidt, <r.s@demo.com>
+Build-Depends: 
+Standards-Version: 4.0.0
+
+
+Package: demopackage
+Architecture: all
+Section: python
+Depends: python2.7 (>=2.7.9-1)
+Description: Supplies a demopackage with start-stop-script. 
+ .
+ It provides the following features:
+	- talking via python
+	- starting via service 
+

@@ -1,0 +1,10 @@
+Format: http://www.debian.org/doc/packagin-manuals/copyright-format/1.0/
+Upstream-Name: demopackage
+Upstream-Contact: R. S.,<r.s@example.com>
+
+Files:*
+Copyright: 2018, Company GmbH, <info@company.com>
+Licesnse: All rights reserved.
+	Full All rights reserved. link here
+	.
+

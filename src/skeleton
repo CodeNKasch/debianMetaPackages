@@ -1,0 +1,88 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          skeleton
+# Required-Start:    $local_fs $network $named $remote_fs
+# Should-Start:      $local_fs $network $named $remote_fs
+# Required-Stop:
+# Should-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: template service start stop script
+# Description:       use this script as template for starting scripts as wheezy service (old old old stable)
+### END INIT INFO
+
+. /lib/lsb/init-functions
+
+CONFIG="/etc/default.conf"
+NAME=skeleton
+PIDFILE=/var/run/$NAME.pid
+DAEMON="/usr/bin/python /usr/bin/sayHello.py"
+
+## Read Strato Settings and cofniguration params
+if [ -f $CONFIG ] ; then
+	. $CONFIG
+	DAEMON_OPTS="$SOME $CONFIG $VALUES"
+else
+	echo "config missing"
+	exit 1
+fi
+
+#only start python if server is reachable
+try_start () {
+	PING=$(ping -c4 $URL | awk '/---/,0')
+	LOOKUP=$(host "$URL" | awk '/has address/ { print $4 }')
+	if [ -n "$PING" ] ; then
+		if [ -n "$LOOKUP" ]; then
+			echo "can resolve host"
+		fi
+		start-stop-daemon --background --start --quiet --make-pidfile  --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_OPTS
+	fi
+}
+
+start () {
+	echo -n "Starting daemon: "$NAME
+	if [ -z "$ENABLED" ]; then
+		echo "service disabled by UI"
+	else
+		try_start
+	fi
+	echo "."
+
+}
+
+stop (){
+	echo -n "Stopping daemon: "$NAME
+	start-stop-daemon --stop --quiet --oknodo --pidfile $PIDFILE
+	echo "."
+}
+
+restart (){
+	echo -n "Restarting daemon: "$NAME
+	start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile $PIDFILE
+	start-stop-daemon --background --start --quiet --make-pidfile  --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_OPTS
+	echo "."
+}
+
+status (){
+	status_of_proc -p $PIDFILE  $NAME $NAME && exit 0 || exit $?
+}
+case "$1" in
+  start)
+	start
+        ;;
+  stop)
+	stop
+	;;
+  restart)
+	restart
+	;;
+
+  status)
+	status
+	;;
+
+  *)
+	echo "Usage: "$1" {start|stop|restart|status}"
+	exit 1
+esac
+exit 0
